@@ -3,10 +3,13 @@ from dotenv import load_dotenv
 import os
 import clickhouse_connect
 from copy import deepcopy
+from flask_cors import CORS
 
 # Load environment variables from the .env file
 load_dotenv()
 app = Flask(__name__)
+
+CORS(app)
 
 # Get credentials and URL from environment variables
 CLICKHOUSE_URL = os.getenv('CLICKHOUSE_URL')
