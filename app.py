@@ -4,6 +4,7 @@ import os
 import clickhouse_connect
 from copy import deepcopy
 from flask_cors import CORS
+from datetime import datetime
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -252,6 +253,294 @@ def delete_data():
 
     except Exception as e:
         return jsonify({"status": "Error", "message": str(e)}), 400
+
+
+# API Endpoint: /table_data
+# Method: GET
+# Parameters: 'parent_node' (query parameter, string)
+# Description: This endpoint fetches child data associated with 'parent_node' id
+# Response: A JSON object with data or an error message.
+@app.route('/second_chart_data', methods=['GET'])
+def get_second_chart_data():
+    node = request.args.get('node')
+    print(node)
+    if not node:
+        return jsonify({"status": "Error", "message": "Parent Node parameter is missing"}), 400
+
+    try:
+        query = "SELECT * FROM 'health_kpi_full' WHERE node = %s"
+        query2 = "SELECT * FROM 'quarterly_figures' WHERE node = %s"
+        result = client.query(query, (node, )).result_rows
+        result2 = client.query(query2, (node,)).result_rows
+        fields = (
+            'node', 'as_of_quarter', 'month_label', '4rq_amount', 'qualification_amount', 'maturity_amount',
+            '2rq_amount','2rq_mature','qualified_percentage',
+            'coverage_status_sum', 'coverage_status_count', 'coverage_percent', '4rq_amount_label', 'maturity_amount_label',
+            '2rq_amount_label', '2rq_mature_label','4rq_target',
+            'qualification_target', 'maturity_target', '4rq_gap', 'qualification_gap', 'maturity_gap', '2rq_gap',
+            '2rq_target', '4rq_target_label', 'qualification_target_label', 'maturity_target_label', '4rq_gap_label', 'qualification_gap_label',
+            'maturity_gap_label', '2rq_gap_label', '2rq_target_label', 'calendar_month', '4rq_qq_growth', '4rq_yy_growth',
+            'mature_qq_growth', 'mature_yy_growth', 'coverage_factor', 'mature_factor','low_pipe_and_maturity','low_maturity','low_pipe','ideal_pipe_and_maturity',
+            'high_risk'
+        )
+
+        fields2 = (
+            'node', 'cd_rel', 'cd_quarter', 'plan_adj_closed', '4rq_amount', '4rq_gap',
+            '4rq_target', 'mature_pipe', 'mature_gap',
+            'mature_target', 'title', '4rq_amount_label', '4rq_gap_label',
+            '4rq_target_label', 'mature_pipe_label', 'mature_gap_label', 'mature_target_label',
+            '4rq_gap_percent'
+        )
+        response = []
+        chart1 = {
+            "comments": "1st-chart",
+            "header": {
+                "title": "4RQ TREND",
+                "subtitle": ["GAP"]
+            },
+            "body": {
+                "xValues": [],
+                "yValues": [],
+                "target": "",
+                "unitPrefix": "$",
+                "unitSuffix": "M",
+            },
+            "footer": {
+                "Q/Q": "",
+                "Y/Y": "",
+                "IR": ""
+            }
+        }
+
+        chart2 = {
+            "comments": "2nd-chart",
+            "header": {
+                "title": "STAGES 2-3 AS % OF 4RQ",
+                "subtitle": ["GAP"]
+            },
+            "body": {
+                "xValues": [],
+                "yValues": [],
+                "target": "",
+                "unitSuffix": "%",
+                "fillColor": "caribbean-green-60"
+            }
+        }
+
+        chart3 = {
+            "comments": "3rd-chart",
+            "header": {
+                "title": "MATURITY TREND",
+                "subtitle": ["GAP"]
+            },
+            "body": {
+                "xValues": [],
+                "yValues": [],
+                "target": "",
+                "unitPrefix": "$",
+                "unitSuffix": "M",
+                "fillColor": "midnight-80"
+            },
+            "footer": {
+                "Q/Q": "",
+                "Y/Y": "",
+                "IR": ""
+            }
+        }
+
+        chart4 = {
+            "comments": "4th-chart",
+            "header": {
+                "title": "% OF REPS < 2X COVERAGE",
+            },
+            "body": {
+                "xValues": [],
+                "yValues": [],
+                "target": "",
+                "unitSuffix": "%",
+                "fillColor": "sunset-red"
+            }
+        }
+
+        chart5 = {
+          "comments": "5th-chart",
+          "header": {
+            "title": "4RQ PIPELINE BY QTR (GAPS BELOW)"
+          },
+          "body": {
+            "matureValues": [],
+            "matureDescriptions": [],
+            "thresholdValues": [],
+            "unitPrefix": "$",
+            "unitSuffix": "M",
+            "fillColor": "tropical-sky-20"
+          }
+        }
+
+        chart6 = {
+          "comments": "6th-chart",
+          "header": {
+            "title": "2 RQW TREND",
+            "subtitle": ["GAP", "$270.0M"]
+          },
+          "body": {
+            "xValues": [
+            ],
+            "yValues": [],
+            "target": "",
+            "unitPrefix": "$",
+            "unitSuffix": "M",
+            "fillColor": "sunburst-70"
+          }
+        }
+
+        chart7 = {
+          "comments": "7th-chart",
+          "header": {
+            "title": "MATURE STAGES (>=5) BY QTR (GAPS BELOW)"
+          },
+          "body": {
+            "matureValues": [],
+            "matureDescriptions": [],
+            "thresholdValues": [],
+            "irPercentValues": [],
+            "unitPrefix": "$",
+            "unitSuffix": "M",
+            "fillColor": ["algae-green-60", "bad-red"]
+          },
+          "legend": [
+            {
+              "color": "algae-green-60",
+              "text": "Stage 4",
+              "value": 0.9
+            },
+            {
+              "color": "bad-red",
+              "text": "Stage 5",
+              "value": 0.1
+            }
+          ]
+        }
+
+        chart8 = {
+          "comments": "8th-chart",
+          "header": {
+            "title": "COVERAGE QUADRANTS"
+          },
+          "body": {
+            "xValues": [],
+            "yValues": []
+          },
+          "grid": [
+            {
+              "color": "sunburst-40",
+              "textColor": "midnight-grey-80",
+              "text": ["Low Pipe &", "Maturity"],
+              "value": []
+            },
+            {
+              "color": "midnight-20",
+              "textColor": "midnight-grey-80",
+              "text": ["Low Pipe"],
+              "value": []
+            },
+            {
+              "color": "sunset-red-90",
+              "textColor": "white",
+              "text": ["High Risk"],
+              "value": []
+            },
+            {
+              "color": "aurora-green-20",
+              "textColor": "midnight-grey-80",
+              "text": ["Ideal Pipe &", "Maturity"],
+              "value": []
+            },
+            {
+              "color": "aurora-green-50",
+              "textColor": "white",
+              "text": ["Low Maturity"],
+              "value": []
+            }
+          ],
+          "footer": "4RQ Pipeline Coverage"
+        }
+
+        months = []
+        for index, val in enumerate(result):
+            table_values = dict(zip(fields, val))
+            months.append(table_values["calendar_month"])
+
+            if index == 0:
+                chart1["body"]["target"] = table_values["4rq_target"]
+                chart1["header"]["subtitle"].append(table_values["4rq_gap_label"])
+                chart1["footer"]["Q/Q"] = table_values["4rq_qq_growth"]
+                chart1["footer"]["Y/Y"] = table_values["4rq_yy_growth"]
+
+                chart2["body"]["target"] = table_values["qualification_target"]
+                chart2["header"]["subtitle"].append(table_values["qualification_gap_label"])
+
+                chart3["body"]["target"] = table_values["maturity_target"]
+                chart3["header"]["subtitle"].append(table_values["maturity_gap_label"])
+                chart3["footer"]["Q/Q"] = table_values["mature_qq_growth"]
+                chart3["footer"]["Y/Y"] = table_values["mature_yy_growth"]
+
+                chart6["body"]["target"] = table_values["2rq_target"]
+                chart6["header"]["subtitle"].append(table_values["2rq_gap_label"])
+
+                chart8["body"]["xValues"].append(table_values["coverage_factor"])
+                chart8["body"]["yValues"].append(table_values["mature_factor"])
+                chart8["grid"][0]["value"] = table_values["low_pipe_and_maturity"]
+                chart8["grid"][1]["value"] = table_values["low_pipe"]
+                chart8["grid"][2]["value"] = table_values["high_risk"]
+                chart8["grid"][3]["value"] = table_values["ideal_pipe_and_maturity"]
+                chart8["grid"][4]["value"] = table_values["low_maturity"]
+
+            chart1["body"]["yValues"].append(table_values["4rq_amount"])
+            chart2["body"]["yValues"].append(table_values["qualified_percentage"])
+            chart3["body"]["yValues"].append(table_values["maturity_amount"])
+            chart4["body"]["yValues"].append(table_values["coverage_percent"])
+            chart6["body"]["yValues"].append(table_values["2rq_amount"])
+
+
+        dates = [datetime.strptime(date.strip('"'), "%Y.%m.%d") for date in months]
+
+        # Sort the dates
+        dates_sorted = sorted(dates)
+
+        # Convert back to the original format with quotes
+        sorted_xValues = [f'"{date.strftime("%Y.%m.%d")}"' for date in dates_sorted]
+
+        chart1["body"]["xValues"] = sorted_xValues
+        chart2["body"]["xValues"] = sorted_xValues
+        chart3["body"]["xValues"] = sorted_xValues
+        chart4["body"]["xValues"] = sorted_xValues
+        chart6["body"]["xValues"] = sorted_xValues
+
+        for index, val in enumerate(result2):
+            table_values2 = dict(zip(fields2, val))
+            chart5["body"]["matureValues"].append(table_values2["4rq_gap"])
+            chart5["body"]["thresholdValues"].append(table_values2["4rq_target"])
+            chart5["body"]["matureDescriptions"].append(table_values2["title"])
+
+            chart7["body"]["matureValues"].append(table_values2["mature_gap"])
+            chart7["body"]["thresholdValues"].append(table_values2["mature_target"])
+            chart7["body"]["matureDescriptions"].append(table_values2["title"])
+            chart7["body"]["irPercentValues"].append(table_values2["4rq_gap_percent"])
+
+        response.append(chart1)
+        response.append(chart2)
+        response.append(chart3)
+        response.append(chart4)
+        response.append(chart5)
+        response.append(chart6)
+        response.append(chart7)
+        response.append(chart8)
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"status": "Data not found"}), 404
 
 
 if __name__ == '__main__':
