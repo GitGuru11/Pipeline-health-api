@@ -99,6 +99,7 @@ def get_chart_data():
                 "title": "",
                 "description": {
                     "content": "",
+                    "subtitle": "",
                     "boldLabel": [],
                     "linkLabel": [],
                     "linkAction": []
@@ -108,10 +109,21 @@ def get_chart_data():
             for res_key in res_keys:
                 res_value = deepcopy(res_value_format)
                 res_value["values"] = table_values[f"{res_key.lower()}_score"]
+                res_value["title"] = res_key
                 # res_values_format["titles"] = table_values[""]
                 # res_values_format["titles"] = table_values[""]
                 temp = res_value["description"]["content"] = table_values[f"{res_key.lower()}_insights"]
                 res_value["description"]["content"] = table_values[f"{res_key.lower()}_insights"]
+                if res_key == "Coverage":
+                    res_value["description"]["subtitle"] = "Rolling 4 Qtr Pipeline"
+                elif res_key == "Qualification":
+                    res_value["description"]["subtitle"] = "Rolling 4 Qtr Pipeline in Qualification Stages"
+                elif res_key == "Maturity":
+                    res_value["description"]["subtitle"] = "Rolling 4 Qtr Pipeline in Mature Stages"
+                elif res_key == "Spread":
+                    res_value["description"]["subtitle"] = "Reps Pipeline Health"
+                else:
+                    res_value["description"]["subtitle"] = "Deal Hygiene"
                 # res_values_format["description"]["boldLabel"] =
                 # res_values_format["description"]["linkLabel"] =
                 # res_values_format["description"]["linkAction"] =
