@@ -55,7 +55,7 @@ def get_table_data():
             'coverage_score_status', 'qualification_score_status', 'maturity_score_status', 'spread_score_status', 'quality_score_status', 'total_score_status',
             '2rq_open_pipe', '2rq_threshold', 'openpipe_gap_final', 'qualified_gap_final', 'mature_gap_final',
             'coverage_insights', 'qualification_insights', 'maturity_insights', 'spread_insights', 'quality_insights',
-            'parent'
+            'parent',"node_label"
         )
         response = [dict(zip(fields, values)) for values in result]
         return jsonify(response), 200
