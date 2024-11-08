@@ -27,8 +27,9 @@ if not CLICKHOUSE_URL or not CLICKHOUSE_USER or not CLICKHOUSE_PASSWORD or not C
 # Parameters: 'parent_node' (query parameter, string)
 # Description: This endpoint fetches child data associated with 'parent_node' id
 # Response: A JSON object with data or an error message.
-@app.route('/<tenant>/table_data', methods=['GET'])
-def get_table_data(tenant):
+@app.route('/table_data', methods=['GET'])
+def get_table_data():
+    tenant = request.args.get('tenant')
     parent_node = request.args.get('parent_node')
 
     clickhouse_handler = ClickHouseHandler(
@@ -36,7 +37,7 @@ def get_table_data(tenant):
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant,
+        database=tenant+"_app",
     )
 
     clickhouse_handler.connect()
@@ -70,8 +71,9 @@ def get_table_data(tenant):
 # Parameters: 'node' (query parameter, string)
 # Description: This endpoint fetches chart data associated with 'node' id
 # Response: A JSON object with data or an error message.
-@app.route('/<tenant>/chart_data', methods=['GET'])
-def get_chart_data(tenant):
+@app.route('/chart_data', methods=['GET'])
+def get_chart_data():
+    tenant = request.args.get('tenant')
     node = request.args.get('node')
 
     clickhouse_handler = ClickHouseHandler(
@@ -79,7 +81,7 @@ def get_chart_data(tenant):
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant,
+        database=tenant+"_app",
     )
 
     clickhouse_handler.connect()
@@ -151,8 +153,9 @@ def get_chart_data(tenant):
 # Parameters: 'parent_node' (query parameter, string)
 # Description: This endpoint fetches child data associated with 'parent_node' id
 # Response: A JSON object with data or an error message.
-@app.route('/<tenant>/second_chart_data', methods=['GET'])
-def get_second_chart_data(tenant):
+@app.route('/second_chart_data', methods=['GET'])
+def get_second_chart_data():
+    tenant = request.args.get('tenant')
     node = request.args.get('node')
 
     clickhouse_handler = ClickHouseHandler(
@@ -160,7 +163,7 @@ def get_second_chart_data(tenant):
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant,
+        database=tenant+"_app",
     )
 
     clickhouse_handler.connect()
