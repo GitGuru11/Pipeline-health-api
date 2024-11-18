@@ -32,7 +32,7 @@ def get_table_data():
     tenant = request.args.get('tenant')
     parent_node = request.args.get('parent_node')
 
-    db_name = "wiz" if tenant == "wiz.io" else tenant
+    db_name = "wiz" if tenant == "wiz.io" else tenant.replace(".com","")
 
 
     clickhouse_handler = ClickHouseHandler(
