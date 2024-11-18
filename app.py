@@ -32,12 +32,15 @@ def get_table_data():
     tenant = request.args.get('tenant')
     parent_node = request.args.get('parent_node')
 
+    db_name = "wiz.io" if tenant == "wiz.io" else tenant
+
+
     clickhouse_handler = ClickHouseHandler(
         host="hvw6zseeg3.us-east-1.aws.clickhouse.cloud",
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant+"_app",
+        database=db_name+"_app",
     )
 
     clickhouse_handler.connect()
@@ -76,12 +79,14 @@ def get_chart_data():
     tenant = request.args.get('tenant')
     node = request.args.get('node')
 
+    db_name = "wiz.io" if tenant == "wiz.io" else tenant
+
     clickhouse_handler = ClickHouseHandler(
         host="hvw6zseeg3.us-east-1.aws.clickhouse.cloud",
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant+"_app",
+        database=db_name+"_app",
     )
 
     clickhouse_handler.connect()
@@ -158,12 +163,14 @@ def get_second_chart_data():
     tenant = request.args.get('tenant')
     node = request.args.get('node')
 
+    db_name = "wiz.io" if tenant == "wiz.io" else tenant
+
     clickhouse_handler = ClickHouseHandler(
         host="hvw6zseeg3.us-east-1.aws.clickhouse.cloud",
         port=8443,  # Default ClickHouse HTTPS port
         username="tony",
         password="EbtKn$&0z8#@5vlCcSE",
-        database=tenant+"_app",
+        database=db_name+"_app",
     )
 
     clickhouse_handler.connect()
