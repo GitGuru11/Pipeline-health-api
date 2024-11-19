@@ -79,7 +79,7 @@ def get_chart_data():
     tenant = request.args.get('tenant')
     node = request.args.get('node')
 
-    db_name = "wiz" if tenant == "wiz.io" else tenant
+    db_name = "wiz" if tenant == "wiz.io" else tenant.replace(".com","")
 
     clickhouse_handler = ClickHouseHandler(
         host="hvw6zseeg3.us-east-1.aws.clickhouse.cloud",
@@ -163,7 +163,7 @@ def get_second_chart_data():
     tenant = request.args.get('tenant')
     node = request.args.get('node')
 
-    db_name = "wiz" if tenant == "wiz.io" else tenant
+    db_name = "wiz" if tenant == "wiz.io" else tenant.replace(".com","")
 
     clickhouse_handler = ClickHouseHandler(
         host="hvw6zseeg3.us-east-1.aws.clickhouse.cloud",
